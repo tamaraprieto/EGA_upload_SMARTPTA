@@ -1,4 +1,4 @@
-<svg viewBox="0 0 680 1060" xmlns="http://www.w3.org/2000/svg" role="img" font-family="system-ui, sans-serif" font-size="13">
+<svg viewBox="0 0 680 810" xmlns="http://www.w3.org/2000/svg" role="img" font-family="system-ui, sans-serif" font-size="13">
   <title>EGA Submission Workflow</title>
   <desc>Step-by-step flowchart of the EGA data submission process.</desc>
 
@@ -27,7 +27,7 @@
   <rect x="190" y="40" width="300" height="60" rx="8" fill="#4A90D9"/>
   <text x="340" y="62" text-anchor="middle" fill="white" font-weight="600">1. List files to upload</text>
   <rect x="200" y="70" width="280" height="20" rx="4" fill="#1a5fa8"/>
-  <text x="340" y="84" text-anchor="middle" fill="#b8d4f5" font-size="10" font-family="monospace">du -sk *.bam *.bam.bai &gt; bam.list.eso01.txt</text>
+  <text x="340" y="84" text-anchor="middle" fill="#b8d4f5" font-size="10" font-family="monospace">data_paths/bam.list.eso01.txt</text>
   <line x1="340" y1="100" x2="340" y2="118" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
 
   <!-- 2 -->
