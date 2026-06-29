@@ -2,7 +2,7 @@
 
 This guide documents the full process for submitting genomic data to the [European Genome-phenome Archive (EGA)](https://ega-archive.org/).
 
-It is specifically aimed at **SMART-PTA or single-cell whole-genome sequencing datasets** where each sample generates hundreds to thousands of high-depth BAM files. Manually loading files one by one through the EGA web portal is not feasible at this scale, so this guide covers both the portal workflow (for study and sample registration) and a programmatic approach using the EGA Submitter Portal API (for batch analysis registration).
+It is specifically aimed at **SMART-PTA or single-cell whole-genome sequencing datasets** where each sample generates hundreds to thousands of high-depth BAM files. Manually loading files one by one through the EGA web portal is not feasible at this scale, so this guide covers both the portal workflow (for study and sample registration) and a programmatic approach using the EGA Submitter Portal API (for batch analysis registration). Ultima Genomic delivers mapped alignments (BAM files) rather than raw reads. For that reason, the raw data will be deposited as ANALYSIS (Reference Alignment type) rather than RUNS.
 
 ---
 
@@ -29,7 +29,7 @@ Once your account is validated, [request a submitter role](https://profile.ega-a
 > **Note:** This step may not be required if you are granted access to the lab shared box instead (see below).
 
 ### 1.5 Request Access to the Lab Shared Box
-Open a [Helpdesk ticket](https://ega-archive.org/need-help/) to request access to the lab common box: **ega-box-2193**.
+Open a [Helpdesk ticket](https://ega-archive.org/need-help/) to request access to the lab common box: ega-box-2193. The EGA inbox has a default quota of 10 TB, so large submissions must be uploaded in batches. In practice there may be no hard limit, but if you anticipate exceeding 10 TB it is safer to contact the EGA helpdesk (once the access to be box is granted) to avoid being blocked.
 
 EGA will send a PDF by email requesting:
 - Authorization from **Dan**
@@ -55,7 +55,7 @@ export ASPERA_SCP_PASS=<password>
 
 ## 3. Directory Structure and Scripts
 
-All EGA upload work lives at:
+Previous EGA upload work lives at:
 
 ```
 /gpfs/commons/groups/landau_lab/ResolveOME/EGA_upload/
@@ -144,41 +144,37 @@ See [EGA FTP instructions](https://ega-archive.org/submission/data/uploading-fil
 
 ## 5. Register Metadata in the Submitter Portal
 
-Before registering analyses programmatically, the study and samples must be created manually through the portal. Go to [https://submission.ega-archive.org/submissions](https://submission.ega-archive.org/submissions).
+Before registering analyses programmatically, the study, samples, experiments, dataset, and first analysis must be created manually through the portal. Go to [https://submission.ega-archive.org/submissions](https://submission.ega-archive.org/submissions).
 
-### 5.1 Create a Submission
+Click the **"Create a submission"** green button at the top right. Follow the instructions to complete the **info**, **study**, **samples**, **experiments**, first **analysis** (covering your first batch, up to 10TB) and the **dataset**. Don't forget linking the analysis to the study under the study tab. You will not need to fill in **runs** if your data are mapped BAMs.
 
-Click the **"Create a submission"** green button at the top right. This creates a submission object that will hold all your metadata (study, samples, analyses, dataset).
 
-### 5.2 Register a Study
-
-Inside the submission, go to **Register Study** and fill in the required fields (title, description, study type). This will generate an `EGAS...` accession.
-
-### 5.3 Register Samples
-
-Go to **Register Samples** and fill in the sample metadata interactively through the portal UI. Each sample will receive an `EGAN...` accession. Keep a record of the sample alias → EGAN mapping (you will need it for analysis registration).
-
-### 5.4 Register Analyses via the Portal (first batch — recommended)
-
-For your first batch, submit the analysis manually through the portal to verify all fields are correct before automating. Inside the submission:
-
-1. Go to **Register Analysis**
-2. Set type to **Reference Alignment**
-3. Fill in title, description, genome, platform, and experiment type
-4. Link the study and sample
-5. Select the files from the inbox
-
-> **Tip:** Use the first batch as a sanity check — verify that the analysis looks correct in the portal before running the script on all remaining batches. I recommend finalizing the submission so you can obtain an accession number. Then you can keep adding more analyses while the project remains public
+> **Tip:** Finalise the submission early to obtain an accession number, which may be needed for a manuscript. You can continue adding analyses after finalisation. The dataset will remain private until the EGA team contacts you to confirm you are ready to make it public. You can continue adding datasets after the submission has been made public. 
+ 
 
 ---
 
 ## 6. Register Metadata Programmatically
 
-Once files are uploaded, register metadata using the EGA Submitter Portal API. The scripts below automate analysis creation for the current study.
+Once the new batch is uploaded using globus, register metadata using the EGA Submitter Portal API. The scripts below (Register_metadata.py and Register_metadata_manual.py) automate analysis creation for the esophagus study. Replace with your IDs accordingly. 
 
-**Current study:** `EGAS50000001793`  
-**Submission ID:** `EGA50000001666`  
-**Dataset:** `EGAD50000002573`
+SUBMISSION_ID    = "EGA50000001666"       # Submission containing all analyses
+STUDY_ACCESSION  = "EGAS50000001793"      # Study linked to each analysis
+ANALYSIS_TYPE    = "REFERENCE ALIGNMENT"  # EGA analysis type
+GENOME_ID        = 15                     # GRCh38 (see /api/enums/genomes)
+PLATFORM         = "UG100"                # Ultima Genomics platform
+EXPERIMENT_TYPES = ["Whole genome sequencing"]
+
+# Title pattern:    "BAM files for {sample} ({batch})"
+# Description:      "Bam files resulting from merging all cram files per cell provided by Ultima Genomics"
+
+SAMPLE_MAP = {
+    "eso01": "EGAN50000419612",
+    "eso02": "EGAN50000419609",
+    "eso03": "EGAN50000419610",
+    "eso04": "EGAN50000419611",
+    "eso05": "EGAN50000419613",
+}  
 
 ### 6.1 Create a new analysis for a batch folder
 
@@ -191,18 +187,6 @@ The script:
 - Looks up the corresponding EGAN accession
 - Finds all `.bam` and `.bam.bai` files in the inbox under that folder
 - Creates a `REFERENCE ALIGNMENT` analysis linked to the study and sample
-
-> **Tip:** Submit the first batch manually via the portal (see section 5.4) to verify everything looks correct before running this script.
-
-**Sample → EGAN accession map:**
-
-| Sample | EGAN accession     |
-|--------|--------------------|
-| eso01  | EGAN50000419612    |
-| eso02  | EGAN50000419609    |
-| eso03  | EGAN50000419610    |
-| eso04  | EGAN50000419611    |
-| eso05  | EGAN50000419613    |
 
 ### 6.2 Add files to an existing analysis
 
@@ -219,12 +203,11 @@ python Register_metadata_manual.py 128330 eso05_batch1
 
 ### 6.3 Link analyses to the dataset
 
-After creating analyses, link them to `EGAD50000002573` manually in the [Submitter Portal](https://submission.ega-archive.org/).
+After creating analyses, link them to the study manually in the [Submitter Portal](https://submission.ega-archive.org/).
 
 ---
 
-## 7. Finalise Submission
+## 7. Finalise Submission 
 
-Once all analyses are registered and linked, open a [Helpdesk ticket](https://ega-archive.org/need-help/) to notify the EGA team for review and finalisation.
+You do not need to wait until all batches are uploaded before finalising the submission. If cluster storage is running low, finalise after a few batches have been uploaded and registered. Finalising triggers ingestion on EGA's end, after which the encrypted files will be archived and automatically deleted from the box, and can also be safely deleted from the cluster to free up space. Ingestion can take up to 48 hours, and the submission will remain in a pending/review state until the helpdesk approves it. If storage is not a concern, you can upload and register all batches first and finalise once at the end.
 
-> **Note on ingestion:** File upload and file ingestion are separate steps. Ingestion — where EGA processes and validates your files into the archive — only begins after the submission is finalised. This can take up to 48 hours. You can monitor file status at [https://submission.ega-archive.org/files/archive](https://submission.ega-archive.org/files/archive). The submission will remain in a pending/review state until the helpdesk approves it.
