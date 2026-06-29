@@ -168,7 +168,7 @@ For your first batch, submit the analysis manually through the portal to verify 
 4. Link the study and sample
 5. Select the files from the inbox
 
-> **Tip:** Use the first batch as a sanity check — verify that the analysis looks correct in the portal before running the script on all remaining batches. Once you are happy with the metadata, it is worth finalising the submission early to obtain an accession number (e.g. for a manuscript). You can continue adding analyses to the submission after finalisation while the dataset remains private pending data access approval. I recommend finalizing the submission so you can obtain an accession number. Then you can keep adding more analyses while the project remains public
+> **Tip:** Use the first batch as a sanity check — verify that the analysis looks correct in the portal before running the script on all remaining batches. I recommend finalizing the submission so you can obtain an accession number. Then you can keep adding more analyses while the project remains public
 
 ---
 
