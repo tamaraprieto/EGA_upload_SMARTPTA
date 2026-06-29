@@ -161,6 +161,7 @@ Click the **"Create a submission"** green button at the top right. Follow the in
 
 Once the new batch is uploaded using globus, register metadata using the EGA Submitter Portal API. The scripts below (Register_metadata.py and Register_metadata_manual.py) automate analysis creation for the esophagus study. Replace with your IDs accordingly. 
 
+```
 SUBMISSION_ID    = "EGA50000001666"       # Submission containing all analyses
 STUDY_ACCESSION  = "EGAS50000001793"      # Study linked to each analysis
 ANALYSIS_TYPE    = "REFERENCE ALIGNMENT"  # EGA analysis type
@@ -178,6 +179,7 @@ SAMPLE_MAP = {
     "eso04": "EGAN50000419611",
     "eso05": "EGAN50000419613",
 }  
+```
 
 ### 6.1 Create a new analysis for a batch folder
 
