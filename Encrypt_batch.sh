@@ -28,19 +28,3 @@ java -Xmx16g -jar EGA-Cryptor-2.0.0/ega-cryptor-2.0.0.jar \
 
 ls ${UPLOAD_DIR}*ba* > ${UPLOAD_DIR}/ListFiles.txt
 
-#source ~/.ega_credentials
-#module purge
-#module load aspera/4.19.0-GCCcore-12.3.0
-#export PATH="$HOME/.aspera/sdk:$PATH"   # adjust to the dir from `find` above
-#which ascp
-#ascp --version
-#
-#export ASPERA_SCP_PASS=$ASPERA_SCP_PASS
-#ascp -P33001 -O33001 -QT -l300M \
-#	-L- \
-#	--mode=send \
-#    --user="${EGA_BOX}" \
-#    --host=fasp.ega.ebi.ac.uk \
-#    --file-list="${UPLOAD_DIR}/ListFiles.txt" \
-#    /
-
