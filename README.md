@@ -64,60 +64,46 @@ Previous EGA upload work lives at:
 /gpfs/commons/groups/landau_lab/ResolveOME/EGA_upload/
 ```
 
-Key files and folders:
+### 3.1 List size and full path of the bam and bai files
 
+Create a list of files to be uploaded per donor (sample) annotated with their size
 ```
-EGA_upload/
-├── data_paths/                               # Per-donor file lists (input to encryption)
-│   └── <donor>_batches/
-│       └── bam.list.<donor>.batch<N>.txt     # du-format: <size_kb>  <file_path>
-├── EGA-Cryptor-2.0.0/                        # EGA encryption tool (Java)
-├── <donor>_batch<N>/                         # Encrypted output folders (one per batch)
-│   ├── *.bam.gpg                             # Encrypted BAM files
-│   ├── *.bam.bai.gpg                         # Encrypted BAM index files
-│   ├── *.md5                                 # Checksums (not submitted to EGA)
-│   └── ListFiles.txt                         # List of files in this batch
-├── split_by_size.py                          # Split file lists into ≤N TB batches
-├── Upload_batch.sh                           # SLURM job: encrypt one batch
-├── Upload_batch_missing.sh                   # SLURM job: re-encrypt failed files
-├── Register_metadata.py                      # API script: create analysis for a batch
-└── Register_metadata_manual.py              # API script: add files to existing analysis
+mkdir data_paths
+du /gpfs/commons/groups/landau_lab/ResolveOME/StartDir/cu01/dna/merged/*ba* > data_paths/bam.list.eso02.txt 
+```
+Manually check the lists as you don't want to upload incorrect files
+
+File content example
+```
+78072160        /gpfs/commons/groups/landau_lab/ResolveOME/StartDir/cu01/dna/merged/cu01_p1r1A10.bam
+9400    /gpfs/commons/groups/landau_lab/ResolveOME/StartDir/cu01/dna/merged/cu01_p1r1A10.bam.bai
+77651120        /gpfs/commons/groups/landau_lab/ResolveOME/StartDir/cu01/dna/merged/cu01_p1r1A11.bam
+9384    /gpfs/commons/groups/landau_lab/ResolveOME/StartDir/cu01/dna/merged/cu01_p1r1A11.bam.bai
+73766488        /gpfs/commons/groups/landau_lab/ResolveOME/StartDir/cu01/dna/merged/cu01_p1r1A12.bam
+9376    /gpfs/commons/groups/landau_lab/ResolveOME/StartDir/cu01/dna/merged/cu01_p1r1A12.bam.bai
 ```
 
-**`split_by_size.py`** splits a full `du`-format BAM list into batches of up to 10 TB each, keeping each `.bam` and `.bam.bai` pair together. Run this first if your donor has more data than fits in a single transfer.
+
+### 3.2 Create lists of files adding 10TB or less
+
+**`split_by_size.py`** splits BAM list into batches of up to 10 TB each, keeping each `.bam` and `.bam.bai` pair together.
 
 ```bash
 python3 split_by_size.py data_paths/bam.list.eso01.txt --max-tb 10
 # Outputs: bam.list.eso01.batch1.txt, bam.list.eso01.batch2.txt, ...
 ```
 
-**`Upload_batch.sh`** is a SLURM job that encrypts all BAM files for a given donor and batch using EGA-Cryptor. Submit with `--array` to specify the batch number:
-
-```bash
-sbatch --array=1 Upload_batch.sh eso01     # encrypts batch 1 for eso01
-sbatch --array=1-5 Upload_batch.sh eso01   # encrypts batches 1 through 5
-```
-
-**`Upload_batch_missing.sh`** does the same but only re-encrypts files that failed or are missing from a previous run.
-
----
-
-## 4. Encrypt the Data (~12 hours for 10TB)
-
-Navigate to the upload directory and submit the encryption job:
-
-```bash
-cd /gpfs/commons/groups/landau_lab/ResolveOME/EGA_upload
-sbatch --array=1 Upload_batch.sh eso01
-```
-
+### 3.3 Encrypt a batch (~12 hours for 10TB)
 Files should be encrypted with [Crypt4GH](https://ega-archive.org/submission/data/file-preparation/crypt4gh/) before upload. Encrypted files will have a `.gpg` extension.
 
----
+```bash
+sbatch --array=1 Encrypt_batch.sh eso01     # encrypts batch 1 for eso01
+sbatch --array=1-5 Encrypt_batch.sh eso01   # encrypts batches 1 through 5
+```
 
-## 4. Upload the Data
+### 3.4 Upload the Data
 
-### Option A: Globus (recommended for large datasets)
+#### Option A: Globus (recommended for large datasets)
 
 Aspera was confirmed not working by the EGA team at the time of writing. Use Globus instead (see RESCOMP ticket [RESCOMP-20030](https://jira.nygenome.org/browse/RESCOMP-20030)).
 
@@ -135,7 +121,7 @@ Aspera was confirmed not working by the EGA team at the time of writing. Use Glo
 
 You will receive an email once the Globus transfer completes. Transfer speed is approximately 1 GB/hour, so plan accordingly for large datasets.
 
-### Option B: FTP (small datasets only)
+#### Option B: FTP (small datasets only)
 
 ```bash
 ftp ftp.ega.ebi.ac.uk
@@ -143,9 +129,8 @@ ftp ftp.ega.ebi.ac.uk
 
 See [EGA FTP instructions](https://ega-archive.org/submission/data/uploading-files/ftp/).
 
----
 
-## 5. Register Metadata in the Submitter Portal
+### 3.5a Register Metadata in the Submitter Portal
 
 Before registering analyses programmatically, the study, samples, experiments, dataset, and first analysis must be created manually through the portal. Go to [https://submission.ega-archive.org/submissions](https://submission.ega-archive.org/submissions).
 
@@ -155,9 +140,8 @@ Click the **"Create a submission"** green button at the top right. Follow the in
 > **Tip:** Finalise the submission early to obtain an accession number, which may be needed for a manuscript. You can continue adding analyses after finalisation. The dataset will remain private until the EGA team contacts you to confirm you are ready to make it public. You can continue adding datasets after the submission has been made public. 
  
 
----
 
-## 6. Register Metadata Programmatically
+### 3.5b Register Metadata Programmatically
 
 Once the new batch is uploaded using globus, register metadata using the EGA Submitter Portal API. The scripts below (Register_metadata.py and Register_metadata_manual.py) automate analysis creation for the esophagus study. Replace with your IDs accordingly. 
 
@@ -181,8 +165,6 @@ SAMPLE_MAP = {
 }  
 ```
 
-### 6.1 Create a new analysis for a batch folder
-
 ```bash
 python Register_metadata.py eso02_batch3
 ```
@@ -193,26 +175,10 @@ The script:
 - Finds all `.bam` and `.bam.bai` files in the inbox under that folder
 - Creates a `REFERENCE ALIGNMENT` analysis linked to the study and sample
 
-### 6.2 Add files to an existing analysis
-
-If an analysis was already created and you need to update its file list:
-
-```bash
-python Register_metadata_manual.py <analysis_provisional_id> <folder>
-```
-
-Example:
-```bash
-python Register_metadata_manual.py 128330 eso05_batch1
-```
-
-### 6.3 Link analyses to the dataset
 
 After creating analyses, link them to the study manually in the [Submitter Portal](https://submission.ega-archive.org/).
 
----
+### 3.6 Finalise Submission 
 
-## 7. Finalise Submission 
-
-You do not need to wait until all batches are uploaded before finalising the submission. If cluster storage is running low, finalise after a few batches have been uploaded and registered. Finalising triggers ingestion on EGA's end, after which the encrypted files will be archived and automatically deleted from the box, and can also be safely deleted from the cluster to free up space. Ingestion can take up to 48 hours, and the submission will remain in a pending/review state until the helpdesk approves it. If storage is not a concern, you can upload and register all batches first and finalise once at the end.
+You do not need to wait until all batches are uploaded before finalising the submission. If cluster storage is running low, finalise after a few batches have been uploaded and registered. Finalising triggers ingestion on EGA's end (up to 48 hours), after which the encrypted files will be archived and automatically deleted from the box. Once you have verified that the files have been [archived](https://submission.ega-archive.org/files/archive) you can also be safely delete them from the cluster to free up space. The submission will remain in a pending/review state until the helpdesk approves it or the data has been ingested (?). If storage is not a concern, you can upload and register all batches first and finalise once at the end.
 
