@@ -54,12 +54,11 @@ export ASPERA_SCP_PASS=<password>
 ---
 
 
-## 3. Workflow, Directory Structure and Scripts
+## 3. Workflow
 
 ![EGA Submission Workflow](ega_workflow.svg)
 
 Previous EGA upload work lives at:
-
 ```
 /gpfs/commons/groups/landau_lab/ResolveOME/EGA_upload/
 ```
