@@ -1,97 +1,169 @@
-<svg viewBox="0 0 680 690" xmlns="http://www.w3.org/2000/svg" role="img" font-family="system-ui, sans-serif" font-size="13">
-  <title>EGA Submission Workflow</title>
-  <desc>Step-by-step flowchart of the EGA data submission process.</desc>
-
-  <!-- legend -->
-  <rect x="10" y="10" width="12" height="12" rx="2" fill="#4A90D9"/>
-  <text x="26" y="21" fill="#222" font-size="11">One-time setup</text>
-  <rect x="140" y="10" width="12" height="12" rx="2" fill="#7CB87C"/>
-  <text x="156" y="21" fill="#222" font-size="11">Repeat per batch</text>
-  <rect x="280" y="10" width="12" height="12" rx="2" fill="#E8A838"/>
-  <text x="296" y="21" fill="#222" font-size="11">Portal (manual)</text>
-
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 609.9 523.4">
+  <!-- Generator: Adobe Illustrator 30.5.1, SVG Export Plug-In . SVG Version: 2.1.4 Build 3)  -->
   <defs>
-    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L8,3 z" fill="#999"/>
-    </marker>
-    <marker id="arr-loop" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L8,3 z" fill="#7CB87C"/>
-    </marker>
+    <style>
+      .st0, .st1, .st2 {
+        fill: none;
+      }
+
+      .st3, .st4, .st5, .st6, .st7, .st8, .st9, .st10, .st11, .st12 {
+        isolation: isolate;
+      }
+
+      .st3, .st4, .st8, .st9, .st11 {
+        font-family: Helvetica, Helvetica;
+      }
+
+      .st3, .st6, .st7, .st11 {
+        font-size: 10px;
+      }
+
+      .st3, .st8 {
+        fill: #fdf3e0;
+      }
+
+      .st4 {
+        fill: #e8f5e8;
+      }
+
+      .st4, .st5, .st8, .st9 {
+        font-size: 11px;
+      }
+
+      .st5, .st13, .st12 {
+        fill: #7cb87c;
+      }
+
+      .st5, .st10 {
+        font-family: Helvetica-Bold, Helvetica;
+        font-weight: 700;
+      }
+
+      .st6 {
+        fill: #b8d4f5;
+      }
+
+      .st6, .st7 {
+        font-family: CourierNewPSMT, 'Courier New';
+      }
+
+      .st1 {
+        stroke: #999;
+        stroke-width: 1.5px;
+      }
+
+      .st14 {
+        fill: #4a90d9;
+      }
+
+      .st7 {
+        fill: #c8ecc8;
+      }
+
+      .st9 {
+        fill: #222;
+      }
+
+      .st15 {
+        fill: #1a5fa8;
+      }
+
+      .st16 {
+        fill: #e8a838;
+      }
+
+      .st17 {
+        fill: #3a7a3a;
+      }
+
+      .st2 {
+        stroke: #f0c070;
+        stroke-dasharray: 3 2;
+      }
+
+      .st10 {
+        fill: #fff;
+        font-size: 13px;
+      }
+
+      .st18 {
+        fill: #999;
+      }
+
+      .st11 {
+        fill: #888;
+      }
+
+      .st12 {
+        opacity: .4;
+      }
+    </style>
   </defs>
-
-  <!-- repeat bracket -->
-  <rect x="34" y="196" width="3" height="472" rx="1" fill="#7CB87C" opacity="0.4"/>
-  <text x="22" y="445" text-anchor="middle" fill="#7CB87C" font-size="11" font-weight="600" transform="rotate(-90,22,445)">REPEAT PER BATCH</text>
-
-  <!-- 1 -->
-  <rect x="190" y="40" width="300" height="60" rx="8" fill="#4A90D9"/>
-  <text x="340" y="62" text-anchor="middle" fill="white" font-weight="600">1. List files to upload</text>
-  <rect x="200" y="70" width="280" height="20" rx="4" fill="#1a5fa8"/>
-  <text x="340" y="84" text-anchor="middle" fill="#b8d4f5" font-size="10" font-family="monospace">data_paths/bam.list.eso01.txt</text>
-  <line x1="340" y1="100" x2="340" y2="118" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- 2 -->
-  <rect x="190" y="118" width="300" height="60" rx="8" fill="#4A90D9"/>
-  <text x="340" y="140" text-anchor="middle" fill="white" font-weight="600">2. Split into &lt;10 TB batches</text>
-  <rect x="200" y="148" width="280" height="20" rx="4" fill="#1a5fa8"/>
-  <text x="340" y="162" text-anchor="middle" fill="#b8d4f5" font-size="10" font-family="monospace">python split_by_size.py bam.list.eso01.txt</text>
-  <line x1="340" y1="178" x2="340" y2="196" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- 3 -->
-  <rect x="190" y="196" width="300" height="60" rx="8" fill="#7CB87C"/>
-  <text x="340" y="218" text-anchor="middle" fill="white" font-weight="600">3. Encrypt batch</text>
-  <rect x="200" y="226" width="280" height="20" rx="4" fill="#3a7a3a"/>
-  <text x="340" y="240" text-anchor="middle" fill="#c8ecc8" font-size="10" font-family="monospace">sbatch --array=1 Encrypt_batch.sh eso01</text>
-  <line x1="340" y1="256" x2="340" y2="274" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- 4 -->
-  <rect x="190" y="274" width="300" height="48" rx="8" fill="#7CB87C"/>
-  <text x="340" y="294" text-anchor="middle" fill="white" font-weight="600">4. Upload via Globus</text>
-  <text x="340" y="312" text-anchor="middle" fill="#e8f5e8" font-size="11">Wait for confirmation email (~1 GB/hour)</text>
-
-  <!-- fork -->
-  <line x1="340" y1="322" x2="340" y2="340" stroke="#999" stroke-width="1.5"/>
-  <line x1="210" y1="340" x2="470" y2="340" stroke="#999" stroke-width="1.5"/>
-  <line x1="210" y1="340" x2="210" y2="358" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="470" y1="340" x2="470" y2="358" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="210" y="354" text-anchor="middle" fill="#888" font-size="10">first batch</text>
-  <text x="470" y="354" text-anchor="middle" fill="#888" font-size="10">remaining batches</text>
-
-  <!-- 5a -->
-  <rect x="75" y="358" width="260" height="136" rx="8" fill="#E8A838"/>
-  <text x="205" y="378" text-anchor="middle" fill="white" font-weight="600">5a. Register metadata in portal</text>
-  <text x="205" y="396" text-anchor="middle" fill="#fdf3e0" font-size="11">Study · Samples · Experiments</text>
-  <text x="205" y="412" text-anchor="middle" fill="#fdf3e0" font-size="11">Dataset · First analysis (sanity check)</text>
-  <line x1="85" y1="428" x2="325" y2="428" stroke="#f0c070" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="205" y="448" text-anchor="middle" fill="#fdf3e0" font-size="11">Link analysis to dataset</text>
-  <text x="205" y="466" text-anchor="middle" fill="#fdf3e0" font-size="10">Under the dataset tab in portal</text>
-
-  <!-- 5b -->
-  <rect x="345" y="358" width="255" height="60" rx="8" fill="#7CB87C"/>
-  <text x="472" y="378" text-anchor="middle" fill="white" font-weight="600">5b. Register via script</text>
-  <rect x="355" y="386" width="235" height="20" rx="4" fill="#3a7a3a"/>
-  <text x="472" y="400" text-anchor="middle" fill="#c8ecc8" font-size="10" font-family="monospace">python Register_metadata.py eso01_batch2</text>
-  <line x1="472" y1="418" x2="472" y2="436" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- merge -->
-  <line x1="205" y1="494" x2="205" y2="510" stroke="#999" stroke-width="1.5"/>
-  <line x1="472" y1="418" x2="472" y2="510" stroke="#999" stroke-width="1.5"/>
-  <line x1="205" y1="510" x2="472" y2="510" stroke="#999" stroke-width="1.5"/>
-  <line x1="340" y1="510" x2="340" y2="528" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- 5 (was 6) -->
-  <rect x="190" y="528" width="300" height="140" rx="8" fill="#E8A838"/>
-  <text x="340" y="548" text-anchor="middle" fill="white" font-weight="600">6. Finalise submission</text>
-  <text x="340" y="566" text-anchor="middle" fill="#fdf3e0" font-size="11">Triggers ingestion (up to 48h)</text>
-  <line x1="200" y1="576" x2="480" y2="576" stroke="#f0c070" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="340" y="592" text-anchor="middle" fill="#fdf3e0" font-size="10" font-style="italic">💡 Finalise early to get an accession number.</text>
-  <text x="340" y="606" text-anchor="middle" fill="#fdf3e0" font-size="10" font-style="italic">Dataset stays private until you request otherwise.</text>
-  <line x1="200" y1="616" x2="480" y2="616" stroke="#f0c070" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="340" y="632" text-anchor="middle" fill="#fdf3e0" font-size="11">Verify files · Delete encrypted data</text>
-  <text x="340" y="648" text-anchor="middle" fill="#fdf3e0" font-size="10">submission.ega-archive.org/files/archive</text>
-
-  <!-- loop arrow -->
-  <path d="M490,648 Q610,648 610,256 Q610,216 490,216" stroke="#7CB87C" stroke-width="1.5" fill="none" marker-end="url(#arr-loop)" stroke-dasharray="5,3"/>
-  <text x="618" y="430" fill="#7CB87C" font-size="11" font-weight="600" transform="rotate(90,618,430)">next batch</text>
-
+  <rect class="st14" x="518.7" y="63" width="12" height="12" rx="2" ry="2"/>
+  <text class="st9" transform="translate(534.7 74)"><tspan x="0" y="0">One-time setup</tspan></text>
+  <rect class="st16" x="502.7" y="455.3" width="12" height="12" rx="2" ry="2"/>
+  <text class="st9" transform="translate(518.7 466.3)"><tspan x="0" y="0">Portal (manual)</tspan></text>
+  <rect class="st12" x="21.5" y="156" width="3" height="367.4" rx="1" ry="1"/>
+  <text class="st5" transform="translate(9.5 408.1) rotate(-90)"><tspan x="0" y="0">REPEAT PER BATCH</tspan></text>
+  <rect class="st14" x="177.5" width="300" height="60" rx="8" ry="8"/>
+  <text class="st10" transform="translate(262.8 22)"><tspan x="0" y="0">1. List files to upload</tspan></text>
+  <rect class="st15" x="187.5" y="30" width="280" height="20" rx="4" ry="4"/>
+  <text class="st6" transform="translate(218.4 44)"><tspan x="0" y="0">du *ba* &gt; data_paths/bam.list.eso01.txt</tspan></text>
+  <path class="st0" d=""/>
+  <path class="st18" d="M332,62h-9l4.5,12,4.5-12Z"/>
+  <path class="st18" d="M327.5,78" marker-end="url(#arr)"/>
+  <rect class="st14" x="177.5" y="78" width="300" height="60" rx="8" ry="8"/>
+  <text class="st10" transform="translate(242.8 100)"><tspan x="0" y="0">2. Split into &lt;10 TB batches</tspan></text>
+  <rect class="st15" x="187.5" y="108" width="280" height="20" rx="4" ry="4"/>
+  <text class="st6" transform="translate(201.4 122)"><tspan x="0" y="0">python split_by_size.py bam.list.eso01.txt</tspan></text>
+  <path class="st0" d=""/>
+  <path class="st18" d="M332,141h-9l4.5,12,4.5-12Z"/>
+  <path class="st18" d="M327.5,156" marker-end="url(#arr)"/>
+  <rect class="st13" x="177.5" y="156" width="300" height="60" rx="8" ry="8"/>
+  <text class="st10" transform="translate(276.9 178)"><tspan x="0" y="0">3. Encrypt batch</tspan></text>
+  <rect class="st17" x="187.5" y="186" width="280" height="20" rx="4" ry="4"/>
+  <text class="st7" transform="translate(210.4 200)"><tspan x="0" y="0">sbatch --array=1 Encrypt_batch.sh eso01</tspan></text>
+  <path class="st0" d=""/>
+  <path class="st18" d="M332,219h-9l4.5,12,4.5-12Z"/>
+  <path class="st18" d="M327.5,234" marker-end="url(#arr)"/>
+  <rect class="st13" x="177.5" y="234" width="300" height="48" rx="8" ry="8"/>
+  <text class="st10" transform="translate(263.2 254)"><tspan x="0" y="0">4. Upload via Globus</tspan></text>
+  <text class="st4" transform="translate(229.1 272)"><tspan x="0" y="0">Wait for confirmation email (~1 GB/hour)</tspan></text>
+  <line class="st1" x1="327.5" y1="282" x2="327.5" y2="300"/>
+  <line class="st1" x1="197.5" y1="300" x2="457.5" y2="300"/>
+  <path class="st0" d=""/>
+  <path class="st18" d="M202,309h-9l4.5,12,4.5-12Z"/>
+  <path class="st18" d="M197.5,318" marker-end="url(#arr)"/>
+  <path class="st0" d=""/>
+  <path class="st18" d="M462,309h-9l4.5,12,4.5-12Z"/>
+  <path class="st18" d="M457.5,318" marker-end="url(#arr)"/>
+  <text class="st11" transform="translate(140.7 314)"><tspan x="0" y="0">first batch</tspan></text>
+  <text class="st11" transform="translate(467.5 314.2)"><tspan x="0" y="0">remaining batches</tspan></text>
+  <rect class="st16" x="62.5" y="318" width="260" height="64.6" rx="8" ry="8"/>
+  <text class="st10" transform="translate(97.8 338)"><tspan x="0" y="0">5a. Register metadata in portal</tspan></text>
+  <text class="st8" transform="translate(117.3 356)"><tspan x="0" y="0">Study · Samples · Experiments</tspan></text>
+  <text class="st8" transform="translate(101.4 372)"><tspan x="0" y="0">Dataset · First analysis (sanity check)</tspan></text>
+  <rect class="st13" x="332.5" y="318" width="255" height="60" rx="8" ry="8"/>
+  <text class="st10" transform="translate(391.9 338)"><tspan x="0" y="0">5b. Register via script</tspan></text>
+  <rect class="st17" x="336.9" y="346" width="246.8" height="20" rx="4" ry="4"/>
+  <text class="st7" transform="translate(339.4 360)"><tspan x="0" y="0">python Register_metadata.py eso01_batch2</tspan></text>
+  <path class="st0" d=""/>
+  <line class="st1" x1="192.5" y1="384" x2="192.5" y2="400"/>
+  <line class="st1" x1="192.5" y1="400" x2="459.5" y2="400"/>
+  <path class="st0" d=""/>
+  <path class="st18" d="M332,404h-9l4.5,12,4.5-12Z"/>
+  <path class="st18" d="M327.5,418" marker-end="url(#arr)"/>
+  <rect class="st16" x="177.5" y="418" width="300" height="86.6" rx="8" ry="8"/>
+  <text class="st10" transform="translate(258.1 438)"><tspan x="0" y="0">6. Finalise submission</tspan></text>
+  <text class="st8" transform="translate(255.8 456)"><tspan x="0" y="0">Triggers ingestion (up to 48h)</tspan></text>
+  <line class="st2" x1="187.5" y1="466" x2="467.5" y2="466"/>
+  <text class="st8" transform="translate(228 482)"><tspan x="0" y="0">Verify file archival · Delete encrypted data</tspan></text>
+  <text class="st3" transform="translate(238.5 495)"><tspan x="0" y="0">submission.ega-archive.org/files/archive</tspan></text>
+  <path class="st0" d=""/>
+  <path class="st13" d="M486.5,180.5v-9l-12,4.5,12,4.5Z"/>
+  <path class="st13" d="M477.5,254.2" marker-end="url(#arr-loop)"/>
+  <line class="st1" x1="197.5" y1="300" x2="197.5" y2="316"/>
+  <line class="st1" x1="457.5" y1="300" x2="457.5" y2="316"/>
+  <line class="st1" x1="458.7" y1="383.4" x2="458.7" y2="399.4"/>
 </svg>
