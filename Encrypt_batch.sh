@@ -6,7 +6,7 @@
 #SBATCH --mail-type FAIL,COMPLETED
 #SBATCH --cpus-per-task 8
 #SBATCH -t 50:00:00
-#SBATCH --mem 20G
+#SBATCH --mem 2G
  
 donor=$1
 mybatch=$SLURM_ARRAY_TASK_ID
