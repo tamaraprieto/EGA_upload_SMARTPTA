@@ -102,38 +102,40 @@ sbatch --array=1-5 Encrypt_batch.sh eso01   # encrypts batches 1 through 5
 
 ### 3.4 Upload the Data
 
-#### Option A: Globus (recommended for large datasets)
+Once your files have been encrypted you can upload them to the box. 
 
-Aspera was confirmed not working by the EGA team at the time of writing. Use Globus instead (see RESCOMP ticket [RESCOMP-20030](https://jira.nygenome.org/browse/RESCOMP-20030)).
-
-**Setup:**
-1. Log in to Globus using the Google Authenticator app
-2. Set up the endpoint using the PDT: [NYGC Globus login instructions](https://wiki.nygenome.org/spaces/rescomp/pages/165609778/How+to+login+to+Globus+with+SSO)
-3. Go to [Globus File Manager](https://app.globus.org/file-manager/gcp) and click **FILE MANAGER**
-
-**Left panel (source — NYGC):**
-
-- Data under `gpfs/commons/groups`: use the [groups endpoint](https://app.globus.org/file-manager/collections/529df0b0-5a48-4266-ac76-9feba72449a6/overview). Remove everything before `landau_lab` to navigate to your folder.
-- Data under your home directory: use the [home endpoint](https://app.globus.org/file-manager/collections/c50f3e55-0997-4c13-92a4-ba7a4b8d74ad)
-
-**Right panel (destination):** EMBL-EBI Private Collection
-
-You will receive an email once the Globus transfer completes. Transfer speed is approximately 1 GB/hour, so plan accordingly for large datasets.
-
-#### Option B: FTP (small datasets only)
+If your dataset is small, you can upload them using [FTP](https://ega-archive.org/submission/data/uploading-files/ftp/).
 
 ```bash
 ftp ftp.ega.ebi.ac.uk
 ```
+However, if you have many batches, uploading through FTP could take months. Aspera is an alternative, but the EGA team confirmed it wasn't working at the time of writing. Use **Globus** instead.
 
-See [EGA FTP instructions](https://ega-archive.org/submission/data/uploading-files/ftp/).
+The EGA team sent me the information on how to use Globus via email The information is not in their website. See RESCOMP ticket [RESCOMP-20030](https://jira.nygenome.org/browse/RESCOMP-20030) for details on how to set it up. You will need to set up the endpoint using the [NYGC Globus login instructions](https://wiki.nygenome.org/spaces/rescomp/pages/165609778/How+to+login+to+Globus+with+SSO) and the **Google Authenticator app** or equivalent.    
 
+Then for each batch upload:
+1. **Log in into [Globus](https://app.globus.org/file-manager/gcp)**. Your username is not your complete nygc email, only the name initial and last name. E.g. tprieto. Open the **Google Authenticator app** to obtain the one-time-code.  
+3.  Click on **FILE MANAGER** at the left side bar.
+4. Select a **Collection** under the left upper panel. This will be the folder(s) your want to upload.
+
+- Data under `gpfs/commons/groups`: use the [groups endpoint](https://app.globus.org/file-manager/collections/529df0b0-5a48-4266-ac76-9feba72449a6/overview). Remove everything before `landau_lab` to navigate to your folder under **Path**.
+- Data under your home directory: use the [home endpoint](https://app.globus.org/file-manager/collections/c50f3e55-0997-4c13-92a4-ba7a4b8d74ad)
+
+5. Then select the **EMBL-EBI Private Collection** as **Collection** on the right panel. This is where you want to upload the data to (the EGA box). You might need to authenticate using your EGA box credentials. 
+
+6. Press **`Start`** under the left-side panel. 
+  
+You will receive an email once the Globus transfer completes. Transfer speed is approximately 1 GB/hour, so plan accordingly for large datasets.
+
+Once the upload has been completed, this **triggers ingestion on EGA's end (up to 48 hours)**.  
 
 ### 3.5a Register Metadata in the Submitter Portal
 
-Before registering analyses programmatically, the study, samples, experiments, dataset, and first analysis must be created manually through the portal. Go to [https://submission.ega-archive.org/submissions](https://submission.ega-archive.org/submissions).
+Before registering analyses programmatically, the study, samples, experiments, and dataset must be created manually through the portal. Go to [https://submission.ega-archive.org/submissions](https://submission.ega-archive.org/submissions).
 
-Click the **"Create a submission"** green button at the top right. Follow the instructions to complete the **info**, **study**, **samples**, **experiments**, first **analysis** (covering your first batch, up to 10TB) and the **dataset**. Don't forget linking the analysis to the study under the study tab. You will not need to fill in **runs** if your data are mapped BAMs.
+I also recommend adding the first analysis (covering the first batch, up to 10TB) manually to understand how the programmatic registration of subsequent analyses works under the hood. If you have fewer than a few hundred files, you might choose to create analyses manually only. 
+
+Click the **"Create a submission"** green button at the top right. Follow the instructions to complete the **info**, **study**, **samples**, **experiments**, first **analysis** and the **dataset**. Don't forget linking the analysis to the study under the study tab. You will not need to fill in **runs** if your data are mapped BAMs.
 
 
 > **Tip:** Finalise the submission early to obtain an accession number, which may be needed for a manuscript. You can continue adding analyses after finalisation. The dataset will remain private until the EGA team contacts you to confirm you are ready to make it public. You can continue adding datasets after the submission has been made public. 
@@ -142,7 +144,7 @@ Click the **"Create a submission"** green button at the top right. Follow the in
 
 ### 3.5b Register Metadata Programmatically
 
-Once the new batch is uploaded using globus, register metadata using the EGA Submitter Portal API. The scripts below (Register_metadata.py and Register_metadata_manual.py) automate analysis creation for the esophagus study. Replace with your IDs accordingly. 
+Once the a batch is uploaded using globus and ingested, register metadata using the EGA Submitter Portal API. The script Register_metadata.py automates analysis registration for the esophagus study. Replace with your IDs accordingly to register your own analysis. 
 
 ```
 SUBMISSION_ID    = "EGA50000001666"       # Submission containing all analyses
@@ -179,5 +181,5 @@ After creating analyses, link them to the study manually in the [Submitter Porta
 
 ### 3.6 Finalise Submission 
 
-You do not need to wait until all batches are uploaded before finalising the submission. If cluster storage is running low, finalise after a few batches have been uploaded and registered. Finalising triggers ingestion on EGA's end (up to 48 hours), after which the encrypted files will be archived and automatically deleted from the box. Once you have verified that the files have been [archived](https://submission.ega-archive.org/files/archive) you can also be safely delete them from the cluster to free up space. The submission will remain in a pending/review state until the helpdesk approves it or the data has been ingested (?). If storage is not a concern, you can upload and register all batches first and finalise once at the end.
+You do not need to wait until all batches are uploaded before finalizing the submission. You can finalize as many times as needed, especially if cluster space is limited. The submission will remain in a pending/review state until the helpdesk approves it (it can take up to one week). The files will be archived and automatically deleted from the EGA box. Once you have **verified that the files have been [archived](https://submission.ega-archive.org/files/archive)**, you can safely **delete** them from the cluster to free up space before preparing the next batch.  
 
