@@ -1,54 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 609.9 523.4">
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 599.8 522.1">
   <!-- Generator: Adobe Illustrator 30.5.1, SVG Export Plug-In . SVG Version: 2.1.4 Build 3)  -->
   <defs>
     <style>
-      .st0, .st1, .st2 {
-        fill: none;
+      .st0, .st1 {
+        fill: #b8d4f5;
       }
 
-      .st3, .st4, .st5, .st6, .st7, .st8, .st9, .st10, .st11, .st12 {
+      .st2, .st3, .st1, .st4, .st5, .st6, .st7, .st8, .st9 {
         isolation: isolate;
       }
 
-      .st3, .st4, .st8, .st9, .st11 {
-        font-family: Helvetica, Helvetica;
-      }
-
-      .st3, .st6, .st7, .st11 {
-        font-size: 10px;
-      }
-
-      .st3, .st8 {
-        fill: #fdf3e0;
-      }
-
-      .st4 {
-        fill: #e8f5e8;
-      }
-
-      .st4, .st5, .st8, .st9 {
+      .st2, .st3, .st6, .st10 {
         font-size: 11px;
       }
 
-      .st5, .st13, .st12 {
+      .st2, .st6, .st10, .st8 {
+        font-family: Helvetica, Helvetica;
+      }
+
+      .st2, .st10 {
+        fill: #f7e0fc;
+      }
+
+      .st11 {
+        stroke: #7cb87c;
+        stroke-dasharray: 5 3;
+        stroke-width: 2px;
+      }
+
+      .st11, .st12 {
+        fill: none;
+      }
+
+      .st3, .st13, .st9 {
         fill: #7cb87c;
       }
 
-      .st5, .st10 {
+      .st3, .st7 {
         font-family: Helvetica-Bold, Helvetica;
         font-weight: 700;
       }
 
-      .st6 {
-        fill: #b8d4f5;
-      }
-
-      .st6, .st7 {
+      .st1, .st5 {
         font-family: CourierNewPSMT, 'Courier New';
       }
 
-      .st1 {
+      .st1, .st5, .st8 {
+        font-size: 10px;
+      }
+
+      .st12 {
         stroke: #999;
         stroke-width: 1.5px;
       }
@@ -57,113 +59,156 @@
         fill: #4a90d9;
       }
 
-      .st7 {
+      .st5, .st15 {
         fill: #c8ecc8;
       }
 
-      .st9 {
-        fill: #222;
-      }
-
-      .st15 {
-        fill: #1a5fa8;
-      }
-
-      .st16 {
-        fill: #e8a838;
+      .st6, .st16 {
+        fill: #fdf3e0;
       }
 
       .st17 {
+        fill: #1a5fa8;
+      }
+
+      .st18 {
+        fill: #e8a838;
+      }
+
+      .st19 {
+        fill: #a770e0;
+      }
+
+      .st20 {
         fill: #3a7a3a;
       }
 
-      .st2 {
-        stroke: #f0c070;
-        stroke-dasharray: 3 2;
-      }
-
-      .st10 {
+      .st7 {
         fill: #fff;
         font-size: 13px;
       }
 
-      .st18 {
+      .st21 {
         fill: #999;
       }
 
-      .st11 {
+      .st8 {
         fill: #888;
       }
 
-      .st12 {
+      .st9 {
         opacity: .4;
       }
     </style>
   </defs>
-  <rect class="st14" x="518.7" y="63" width="12" height="12" rx="2" ry="2"/>
-  <text class="st9" transform="translate(534.7 74)"><tspan x="0" y="0">One-time setup</tspan></text>
-  <rect class="st16" x="502.7" y="455.3" width="12" height="12" rx="2" ry="2"/>
-  <text class="st9" transform="translate(518.7 466.3)"><tspan x="0" y="0">Portal (manual)</tspan></text>
-  <rect class="st12" x="21.5" y="156" width="3" height="367.4" rx="1" ry="1"/>
-  <text class="st5" transform="translate(9.5 408.1) rotate(-90)"><tspan x="0" y="0">REPEAT PER BATCH</tspan></text>
-  <rect class="st14" x="177.5" width="300" height="60" rx="8" ry="8"/>
-  <text class="st10" transform="translate(262.8 22)"><tspan x="0" y="0">1. List files to upload</tspan></text>
-  <rect class="st15" x="187.5" y="30" width="280" height="20" rx="4" ry="4"/>
-  <text class="st6" transform="translate(218.4 44)"><tspan x="0" y="0">du *ba* &gt; data_paths/bam.list.eso01.txt</tspan></text>
-  <path class="st0" d=""/>
-  <path class="st18" d="M332,62h-9l4.5,12,4.5-12Z"/>
-  <path class="st18" d="M327.5,78" marker-end="url(#arr)"/>
-  <rect class="st14" x="177.5" y="78" width="300" height="60" rx="8" ry="8"/>
-  <text class="st10" transform="translate(242.8 100)"><tspan x="0" y="0">2. Split into &lt;10 TB batches</tspan></text>
-  <rect class="st15" x="187.5" y="108" width="280" height="20" rx="4" ry="4"/>
-  <text class="st6" transform="translate(201.4 122)"><tspan x="0" y="0">python split_by_size.py bam.list.eso01.txt</tspan></text>
-  <path class="st0" d=""/>
-  <path class="st18" d="M332,141h-9l4.5,12,4.5-12Z"/>
-  <path class="st18" d="M327.5,156" marker-end="url(#arr)"/>
-  <rect class="st13" x="177.5" y="156" width="300" height="60" rx="8" ry="8"/>
-  <text class="st10" transform="translate(276.9 178)"><tspan x="0" y="0">3. Encrypt batch</tspan></text>
-  <rect class="st17" x="187.5" y="186" width="280" height="20" rx="4" ry="4"/>
-  <text class="st7" transform="translate(210.4 200)"><tspan x="0" y="0">sbatch --array=1 Encrypt_batch.sh eso01</tspan></text>
-  <path class="st0" d=""/>
-  <path class="st18" d="M332,219h-9l4.5,12,4.5-12Z"/>
-  <path class="st18" d="M327.5,234" marker-end="url(#arr)"/>
-  <rect class="st13" x="177.5" y="234" width="300" height="48" rx="8" ry="8"/>
-  <text class="st10" transform="translate(263.2 254)"><tspan x="0" y="0">4. Upload via Globus</tspan></text>
-  <text class="st4" transform="translate(229.1 272)"><tspan x="0" y="0">Wait for confirmation email (~1 GB/hour)</tspan></text>
-  <line class="st1" x1="327.5" y1="282" x2="327.5" y2="300"/>
-  <line class="st1" x1="197.5" y1="300" x2="457.5" y2="300"/>
-  <path class="st0" d=""/>
-  <path class="st18" d="M202,309h-9l4.5,12,4.5-12Z"/>
-  <path class="st18" d="M197.5,318" marker-end="url(#arr)"/>
-  <path class="st0" d=""/>
-  <path class="st18" d="M462,309h-9l4.5,12,4.5-12Z"/>
-  <path class="st18" d="M457.5,318" marker-end="url(#arr)"/>
-  <text class="st11" transform="translate(140.7 314)"><tspan x="0" y="0">first batch</tspan></text>
-  <text class="st11" transform="translate(467.5 314.2)"><tspan x="0" y="0">remaining batches</tspan></text>
-  <rect class="st16" x="62.5" y="318" width="260" height="64.6" rx="8" ry="8"/>
-  <text class="st10" transform="translate(97.8 338)"><tspan x="0" y="0">5a. Register metadata in portal</tspan></text>
-  <text class="st8" transform="translate(117.3 356)"><tspan x="0" y="0">Study · Samples · Experiments</tspan></text>
-  <text class="st8" transform="translate(101.4 372)"><tspan x="0" y="0">Dataset · First analysis (sanity check)</tspan></text>
-  <rect class="st13" x="332.5" y="318" width="255" height="60" rx="8" ry="8"/>
-  <text class="st10" transform="translate(391.9 338)"><tspan x="0" y="0">5b. Register via script</tspan></text>
-  <rect class="st17" x="336.9" y="346" width="246.8" height="20" rx="4" ry="4"/>
-  <text class="st7" transform="translate(339.4 360)"><tspan x="0" y="0">python Register_metadata.py eso01_batch2</tspan></text>
-  <path class="st0" d=""/>
-  <line class="st1" x1="192.5" y1="384" x2="192.5" y2="400"/>
-  <line class="st1" x1="192.5" y1="400" x2="459.5" y2="400"/>
-  <path class="st0" d=""/>
-  <path class="st18" d="M332,404h-9l4.5,12,4.5-12Z"/>
-  <path class="st18" d="M327.5,418" marker-end="url(#arr)"/>
-  <rect class="st16" x="177.5" y="418" width="300" height="86.6" rx="8" ry="8"/>
-  <text class="st10" transform="translate(258.1 438)"><tspan x="0" y="0">6. Finalise submission</tspan></text>
-  <text class="st8" transform="translate(255.8 456)"><tspan x="0" y="0">Triggers ingestion (up to 48h)</tspan></text>
-  <line class="st2" x1="187.5" y1="466" x2="467.5" y2="466"/>
-  <text class="st8" transform="translate(228 482)"><tspan x="0" y="0">Verify file archival · Delete encrypted data</tspan></text>
-  <text class="st3" transform="translate(238.5 495)"><tspan x="0" y="0">submission.ega-archive.org/files/archive</tspan></text>
-  <path class="st0" d=""/>
-  <path class="st13" d="M486.5,180.5v-9l-12,4.5,12,4.5Z"/>
-  <path class="st13" d="M477.5,254.2" marker-end="url(#arr-loop)"/>
-  <line class="st1" x1="197.5" y1="300" x2="197.5" y2="316"/>
-  <line class="st1" x1="457.5" y1="300" x2="457.5" y2="316"/>
-  <line class="st1" x1="458.7" y1="383.4" x2="458.7" y2="399.4"/>
+  <rect class="st9" x="24.5" y="156" width="4.2" height="366.1" rx="1" ry="1" transform="translate(53.2 678.1) rotate(-180)"/>
+  <g class="st4">
+    <text class="st3" transform="translate(17.5 408.1) rotate(-90)"><tspan x="0" y="0">REPEAT PER BATCH</tspan></text>
+  </g>
+  <rect class="st14" x="163.5" width="300" height="60" rx="8" ry="8"/>
+  <g class="st4">
+    <text class="st7" transform="translate(248.8 22)"><tspan x="0" y="0">1. List files to upload</tspan></text>
+  </g>
+  <rect class="st17" x="173.5" y="30" width="280" height="20" rx="4" ry="4"/>
+  <g class="st4">
+    <text class="st1" transform="translate(204.4 44)"><tspan x="0" y="0">du *ba* &gt; data_paths/bam.list.eso02.txt</tspan></text>
+  </g>
+  <path class="st0" d="M0,0"/>
+  <path class="st21" d="M318,62h-9l4.5,12,4.5-12Z"/>
+  <path class="st21" d="M313.5,78" marker-end="url(#arr)"/>
+  <rect class="st14" x="163.5" y="78" width="300" height="60" rx="8" ry="8"/>
+  <g class="st4">
+    <text class="st7" transform="translate(228.8 100)"><tspan x="0" y="0">2. Split into &lt;10 TB batches</tspan></text>
+  </g>
+  <rect class="st17" x="173.5" y="108" width="280" height="20" rx="4" ry="4"/>
+  <g class="st4">
+    <text class="st1" transform="translate(187.4 122)"><tspan x="0" y="0">python split_by_size.py bam.list.eso02.txt</tspan></text>
+  </g>
+  <path class="st0" d="M0,0"/>
+  <path class="st21" d="M318,141h-9l4.5,12,4.5-12Z"/>
+  <path class="st21" d="M313.5,156" marker-end="url(#arr)"/>
+  <rect class="st13" x="163.5" y="156" width="300" height="60" rx="8" ry="8"/>
+  <g class="st4">
+    <text class="st7" transform="translate(262.9 178)"><tspan x="0" y="0">3. Encrypt batch</tspan></text>
+  </g>
+  <rect class="st20" x="173.5" y="186" width="280" height="20" rx="4" ry="4"/>
+  <g class="st4">
+    <text class="st5" transform="translate(196.4 200)"><tspan x="0" y="0">sbatch --array=1 Encrypt_batch.sh eso02</tspan></text>
+  </g>
+  <path class="st15" d="M0,0"/>
+  <path class="st21" d="M318,219h-9l4.5,12,4.5-12Z"/>
+  <path class="st21" d="M313.5,234" marker-end="url(#arr)"/>
+  <rect class="st19" x="163.5" y="234" width="300" height="68.5" rx="8" ry="8"/>
+  <g class="st4">
+    <text class="st7" transform="translate(231.2 254)"><tspan x="0" y="0">4. Upload encrypted batch</tspan></text>
+  </g>
+  <g class="st4">
+    <text class="st2" transform="translate(191.1 272)"><tspan x="0" y="0">app.globus.org/file-manager/collections (~1 GB/hour)</tspan></text>
+  </g>
+  <line class="st12" x1="313.5" y1="306" x2="313.5" y2="324"/>
+  <line class="st12" x1="183.5" y1="324" x2="443.5" y2="324"/>
+  <path class="st12" d="M0,0"/>
+  <path class="st21" d="M188,333h-9l4.5,12,4.5-12Z"/>
+  <path class="st21" d="M183.5,342" marker-end="url(#arr)"/>
+  <path class="st21" d="M0,0"/>
+  <path class="st21" d="M448,333h-9l4.5,12,4.5-12Z"/>
+  <path class="st21" d="M443.5,342" marker-end="url(#arr)"/>
+  <g class="st4">
+    <text class="st8" transform="translate(126.7 338)"><tspan x="0" y="0">first batch</tspan></text>
+  </g>
+  <g class="st4">
+    <text class="st8" transform="translate(453.5 338.2)"><tspan x="0" y="0">remaining batches</tspan></text>
+  </g>
+  <rect class="st18" x="40.2" y="342" width="275.7" height="67.4" rx="8" ry="8"/>
+  <g class="st4">
+    <text class="st7" transform="translate(77.8 362)"><tspan x="0" y="0">5a. Create a submission manually</tspan></text>
+  </g>
+  <g class="st4">
+    <text class="st6" transform="translate(77.3 379)"><tspan x="0" y="0" xml:space="preserve">Study · Samples · Experiments  · Dataset </tspan></text>
+  </g>
+  <g class="st4">
+    <text class="st6" transform="translate(50.4 396)"><tspan x="0" y="0">Register your first analysis manually (recommended)</tspan></text>
+  </g>
+  <rect class="st13" x="318.5" y="342" width="268.2" height="67.5" rx="8" ry="8"/>
+  <g class="st4">
+    <text class="st7" transform="translate(338.9 363)"><tspan x="0" y="0">5b. Register dataset programatically</tspan></text>
+  </g>
+  <rect class="st20" x="322.9" y="373" width="259.8" height="20" rx="4" ry="4"/>
+  <g class="st4">
+    <text class="st5" transform="translate(331.4 387)"><tspan x="0" y="0">python Register_metadata.py eso01_batch2</tspan></text>
+  </g>
+  <path class="st15" d="M0,0"/>
+  <line class="st12" x1="178.5" y1="409.2" x2="178.5" y2="424"/>
+  <line class="st12" x1="178.5" y1="424" x2="445.5" y2="424"/>
+  <path class="st12" d="M0,0"/>
+  <path class="st21" d="M318,425h-9l4.5,12,4.5-12Z"/>
+  <path class="st21" d="M313.5,442" marker-end="url(#arr)"/>
+  <rect class="st18" x="163.5" y="442" width="300" height="77.2" rx="8" ry="8"/>
+  <g class="st4">
+    <text class="st7" transform="translate(202.1 462)"><tspan x="0" y="0">6. Finalise submission &amp; delete batch</tspan></text>
+  </g>
+  <line class="st16" x1="176.8" y1="482.7" x2="456.8" y2="482.7"/>
+  <g class="st4">
+    <text class="st6" transform="translate(225.3 497.7)"><tspan x="0" y="0">Verify file archival · Delete from cluster</tspan></text>
+  </g>
+  <g class="st4">
+    <text class="st6" transform="translate(221.8 510.7)"><tspan x="0" y="0">submission.ega-archive.org/files/archive</tspan></text>
+  </g>
+  <path class="st16" d="M0,0"/>
+  <path class="st13" d="M463.5,254.2" marker-end="url(#arr-loop)"/>
+  <line class="st12" x1="183.5" y1="324" x2="183.5" y2="340"/>
+  <line class="st12" x1="443.5" y1="324" x2="443.5" y2="340"/>
+  <line class="st12" x1="444.9" y1="409.6" x2="444.7" y2="423.4"/>
+  <g class="st4">
+    <g class="st4">
+      <text class="st10" transform="translate(191.2 289.3)"><tspan x="0" y="0">Triggers ingestion after completion (up to ~48 hours)</tspan></text>
+    </g>
+  </g>
+  <g class="st4">
+    <text class="st6" transform="translate(225.7 476.8)"><tspan x="0" y="0">Up to 1 week for EGA archival/review</tspan></text>
+  </g>
+  <g>
+    <path class="st11" d="M476.1,483.1c175.7-1.3,149.2-282.6,6.6-293"/>
+    <polygon class="st13" points="484.9 187.3 473.5 189.8 484.6 193.3 484.9 187.3"/>
+  </g>
 </svg>
