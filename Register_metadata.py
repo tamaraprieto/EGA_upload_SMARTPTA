@@ -4,10 +4,10 @@ EGA Bulk Analysis Submission Script
 Creates REFERENCE_ALIGNMENT analyses via the EGA Submitter Portal API.
 
 Usage:
-    python ega_bulk_analyses.py <folder>
+    python Register_metadata.py <folder>
 
 Example:
-    python ega_bulk_analyses.py eso02_batch2
+    python Register_metadata.py eso02_batch2
 
 The sample name is extracted from the folder name (everything before '_batch'),
 and looked up in SAMPLE_MAP to find the corresponding EGAN accession.
@@ -98,9 +98,20 @@ def create_analysis(token, folder, sample_name, batch_name, sample_accession):
     files = list_inbox_files(token, folder)
     if not files:
         return None
-    # Only include encrypted BAM and BAI files
-    files = [f for f in files if f["relative_path"].endswith(".bam.gpg") or f["relative_path"].endswith(".bam.bai.gpg")]
+
+    # The EGA API strips the .gpg suffix from relative_path once files are in the
+    # inbox, so paths come back as .bam / .bam.bai (not .bam.gpg / .bam.bai.gpg).
+    # Strip a trailing .gpg before matching so this works either way.
+    def is_bam(f):
+        p = f["relative_path"]
+        if p.endswith(".gpg"):
+            p = p[:-4]
+        return p.endswith(".bam") or p.endswith(".bam.bai")
+
+    files = [f for f in files if is_bam(f)]
     print(f"  Found {len(files)} file(s) (excluding .md5)")
+    if not files:
+        return None
 
     payload = {
         "alias":               folder,
@@ -135,7 +146,7 @@ def create_analysis(token, folder, sample_name, batch_name, sample_accession):
 
 def main():
     if len(sys.argv) != 2:
-        sys.exit("Usage: python ega_bulk_analyses.py <folder>\nExample: python ega_bulk_analyses.py eso02_batch2")
+        sys.exit("Usage: python Register_metadata.py <folder>\nExample: python Register_metadata.py eso02_batch2")
 
     folder = sys.argv[1]
 
