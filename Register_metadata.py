@@ -11,6 +11,10 @@ Example:
 
 The sample name is extracted from the folder name (everything before '_batch'),
 and looked up in SAMPLE_MAP to find the corresponding EGAN accession.
+
+Must be run from the directory containing <folder>/ (e.g.
+/gpfs/commons/groups/landau_lab/ResolveOME/EGA_upload), since it reads the
+local <folder>/ListFiles.txt manifest that was uploaded alongside the data.
 """
 
 import requests
@@ -75,20 +79,90 @@ def auth_headers(token):
 
 # ── File listing ───────────────────────────────────────────────────────────────
 
-def list_inbox_files(token, prefix):
-    for status in ["inbox", "submitted", "available"]:
+def _read_manifest_targets(folder):
+    """
+    Read the local <folder>/ListFiles.txt manifest (uploaded alongside the
+    data) and return the set of expected post-upload filenames.
+
+    EGA strips the .gpg suffix from relative_path once a file is in the
+    inbox, so ".bam.gpg" / ".bam.bai.gpg" on disk become ".bam" / ".bam.bai"
+    in the API. We only keep those two extensions here — checksum-only
+    ".md5" entries are dropped since create_analysis() only wants
+    .bam/.bam.bai anyway.
+    """
+    # Accept being run either from the parent directory (folder/ListFiles.txt)
+    # or from inside the batch folder itself (./ListFiles.txt) — try both.
+    candidates = [os.path.join(folder, "ListFiles.txt"), "ListFiles.txt"]
+    manifest_path = next((p for p in candidates if os.path.isfile(p)), None)
+    if manifest_path is None:
+        raise FileNotFoundError(
+            f"No manifest found (tried: {', '.join(candidates)}). This script "
+            f"expects a ListFiles.txt uploaded alongside the data — run it "
+            f"either from the parent directory containing {folder}/, or from "
+            f"inside {folder}/ itself."
+        )
+    targets = set()
+    with open(manifest_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            name = os.path.basename(line)
+            if name.endswith(".gpg"):
+                name = name[:-4]
+            if name.endswith(".bam") or name.endswith(".bam.bai"):
+                targets.add(name)
+    return sorted(targets)
+
+
+def list_inbox_files(token, folder):
+    """
+    Look up each file expected by the local ListFiles.txt manifest, by its
+    exact filename. A full exact filename can only ever match 0 or 1 files
+    at EGA, so this can never trip the "too much data" response-size cap
+    that a broad folder-level prefix query hits on large batches — no
+    guessing/splitting required.
+    """
+    targets = _read_manifest_targets(folder)
+    print(f"  {len(targets)} expected file(s) from ListFiles.txt")
+
+    seen_ids = set()
+    files = []
+    missing = []
+    for name in targets:
         resp = requests.get(
             f"{API_BASE}/files",
             headers=auth_headers(token),
-            params={"status": status, "prefix": f"/{prefix}"},
+            params={"status": "inbox", "prefix": f"/{folder}/{name}"},
         )
         resp.raise_for_status()
-        files = resp.json()
-        if files:
-            print(f"  Found files with status={status!r}")
-            return files
-    print(f"  ⚠ No files found for prefix: /{prefix}")
-    return []
+        matches = resp.json()
+        # A prefix match on "X.bam" will also match "X.bam.bai" (it's a
+        # literal string-prefix of it), so filter to only the file whose
+        # relative_path is exactly this target — not files that merely start
+        # with it — and de-dup by provisional_id as a second safety net.
+        found = False
+        for f in matches:
+            p = f["relative_path"]
+            if p.endswith(".gpg"):
+                p = p[:-4]
+            if p != name:
+                continue
+            found = True
+            fid = f.get("provisional_id")
+            if fid in seen_ids:
+                continue
+            seen_ids.add(fid)
+            files.append(f)
+        if not found:
+            missing.append(name)
+
+    if missing:
+        preview = ", ".join(missing[:5])
+        more = f" (+{len(missing) - 5} more)" if len(missing) > 5 else ""
+        print(f"  ⚠ {len(missing)} expected file(s) not found in inbox: {preview}{more}")
+
+    return files
 
 # ── Analysis creation ──────────────────────────────────────────────────────────
 
@@ -148,7 +222,10 @@ def main():
     if len(sys.argv) != 2:
         sys.exit("Usage: python Register_metadata.py <folder>\nExample: python Register_metadata.py eso02_batch2")
 
-    folder = sys.argv[1]
+    # Strip any trailing slash (e.g. from shell tab-completion, "eso02_batch2/"
+    # -> "eso02_batch2") — a trailing slash would otherwise produce a
+    # double-slash in API prefix queries later and silently match nothing.
+    folder = sys.argv[1].rstrip("/")
 
     # Extract sample and batch from folder name: "eso02_batch2" → "eso02", "batch2"
     parts = folder.split("_batch")
