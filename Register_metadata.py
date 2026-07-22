@@ -20,6 +20,7 @@ local <folder>/ListFiles.txt manifest that was uploaded alongside the data.
 import requests
 import sys
 import os
+import time
 
 # ── Credentials (loaded from ~/.ega_credentials) ──────────────────────────────
 
@@ -114,6 +115,24 @@ def _read_manifest_targets(folder):
                 targets.add(name)
     return sorted(targets)
 
+def _get_with_retry(session, url, params, max_retries=5, backoff=1.5):
+    """
+    GET with retry/backoff on transient connection failures. EGA's API can
+    reset the connection (RemoteDisconnected) under the volume of requests
+    a large batch generates, so a single dropped connection shouldn't kill
+    an entire 300+ file run.
+    """
+    for attempt in range(max_retries):
+        try:
+            resp = session.get(url, params=params, timeout=30)
+            resp.raise_for_status()
+            return resp
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            if attempt == max_retries - 1:
+                raise
+            wait = backoff ** attempt
+            print(f"    ⚠ request failed ({e.__class__.__name__}), retrying in {wait:.1f}s...")
+            time.sleep(wait)
 
 def list_inbox_files(token, folder):
     """
@@ -122,21 +141,32 @@ def list_inbox_files(token, folder):
     at EGA, so this can never trip the "too much data" response-size cap
     that a broad folder-level prefix query hits on large batches — no
     guessing/splitting required.
+
+    Each file is checked against all three possible statuses, since a file
+    can move out of "inbox" (e.g. once EGA finishes checksum verification)
+    before this script runs.
     """
     targets = _read_manifest_targets(folder)
     print(f"  {len(targets)} expected file(s) from ListFiles.txt")
 
+    session = requests.Session()
+    session.headers.update(auth_headers(token))
+
     seen_ids = set()
     files = []
     missing = []
-    for name in targets:
-        resp = requests.get(
-            f"{API_BASE}/files",
-            headers=auth_headers(token),
-            params={"status": "inbox", "prefix": f"/{folder}/{name}"},
-        )
-        resp.raise_for_status()
-        matches = resp.json()
+    for i, name in enumerate(targets):
+        matches = []
+        for status in ["inbox", "submitted", "available"]:
+            resp = _get_with_retry(
+                session,
+                f"{API_BASE}/files",
+                params={"status": status, "prefix": f"/{folder}/{name}"},
+            )
+            matches = resp.json()
+            if matches:
+                break
+
         # A prefix match on "X.bam" will also match "X.bam.bai" (it's a
         # literal string-prefix of it), so filter to only the file whose
         # relative_path is exactly this target — not files that merely start
@@ -156,6 +186,10 @@ def list_inbox_files(token, folder):
             files.append(f)
         if not found:
             missing.append(name)
+
+        if (i + 1) % 50 == 0:
+            print(f"    ...checked {i + 1}/{len(targets)}")
+        time.sleep(0.1)  # small pacing to avoid tripping rate limits
 
     if missing:
         preview = ", ".join(missing[:5])
