@@ -144,7 +144,7 @@ Click the **"Create a submission"** green button at the top right. Follow the in
 
 ### 3.5b Register Metadata Programmatically
 
-Once the a batch is uploaded using globus and ingested, register metadata using the EGA Submitter Portal API. The script Register_metadata.py automates analysis registration for the esophagus study. Replace with your IDs accordingly to register your own analysis. 
+Once a batch is uploaded using globus and checkedsummed (can take up to 48 hours), register metadata using the EGA Submitter Portal API. The script Register_metadata.py automates analysis registration for the esophagus study. Replace with your IDs accordingly to register your own analysis. 
 
 ```
 SUBMISSION_ID    = "EGA50000001666"       # Submission containing all analyses
