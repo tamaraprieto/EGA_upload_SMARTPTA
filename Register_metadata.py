@@ -4,10 +4,11 @@ EGA Bulk Analysis Submission Script
 Creates REFERENCE_ALIGNMENT analyses via the EGA Submitter Portal API.
 
 Usage:
-    python Register_metadata.py <folder>
+    python Register_metadata.py <folder> [--debug]
 
 Example:
     python Register_metadata.py eso02_batch2
+    python Register_metadata.py eso02_batch2 --debug
 
 The sample name is extracted from the folder name (everything before '_batch'),
 and looked up in SAMPLE_MAP to find the corresponding EGAN accession.
@@ -15,6 +16,13 @@ and looked up in SAMPLE_MAP to find the corresponding EGAN accession.
 Must be run from the directory containing <folder>/ (e.g.
 /gpfs/commons/groups/landau_lab/ResolveOME/EGA_upload), since it reads the
 local <folder>/ListFiles.txt manifest that was uploaded alongside the data.
+
+--debug prints every file EGA has actually indexed under /<folder>/ (all
+statuses, no filename filter) before the per-file manifest check runs. If
+list_inbox_files() reports files "not found", this shows whether that's a
+processing delay (nothing under the prefix yet) or a mismatch (files ARE
+there, just under different names than ListFiles.txt expects — e.g. the
+wrong manifest got uploaded alongside the data).
 """
 
 import requests
@@ -134,17 +142,68 @@ def _get_with_retry(session, url, params, max_retries=5, backoff=1.5):
             print(f"    ⚠ request failed ({e.__class__.__name__}), retrying in {wait:.1f}s...")
             time.sleep(wait)
 
+_bad_statuses = set()  # statuses the API has already rejected this run — don't retry them
+
+def _query_files(session, prefix, status, warn_context=""):
+    """
+    GET /files for a given status+prefix, tolerating a status value the API
+    rejects outright (e.g. "invalid input value for enum fs.status_type").
+    That's a 400, not transient, so retrying won't help — log it once per
+    status and treat it as "no matches" so the caller can move on to the
+    next status instead of crashing the whole run.
+    """
+    if status in _bad_statuses:
+        return []
+    try:
+        resp = _get_with_retry(session, f"{API_BASE}/files", params={"status": status, "prefix": prefix})
+        return resp.json()
+    except requests.exceptions.HTTPError as e:
+        code = e.response.status_code if e.response is not None else "?"
+        if code == 400:
+            print(f"  ⚠ API rejected status={status!r} ({code}){' ' + warn_context if warn_context else ''} — skipping this status for the rest of the run")
+            _bad_statuses.add(status)
+            return []
+        raise
+
+# A single response over roughly this many files is suspicious — could be a
+# response-size cap silently truncating the listing rather than a genuine
+# "that's everything" answer. Just a heads-up threshold, not a hard limit.
+SUSPICIOUS_RESULT_SIZE = 500
+
+def _fetch_folder_files(session, folder):
+    """
+    Fetch every file EGA has indexed under /{folder}/, across all three
+    statuses, in one query per status (not one query per expected filename).
+
+    This replaced a per-file exact-path prefix query (prefix=f"/{folder}/{name}")
+    that turned out to reliably return zero matches even for files confirmed
+    to exist at exactly that path — --debug proved this: a folder-level
+    prefix (f"/{folder}/") found all 326 files, while the same files queried
+    individually by full path all came back empty. Whatever EGA's "prefix"
+    param is actually matching on, it isn't a plain string-prefix over the
+    full relative_path. So: fetch the folder listing once, match locally.
+    """
+    seen_ids = set()
+    files = []
+    for status in ["inbox", "submitted", "available"]:
+        matches = _query_files(session, f"/{folder}/", status, warn_context="while listing all files")
+        if len(matches) >= SUSPICIOUS_RESULT_SIZE:
+            print(f"  ⚠ status={status!r} returned {len(matches)} file(s) — at/above the "
+                  f"{SUSPICIOUS_RESULT_SIZE} sanity threshold; verify this isn't a truncated page")
+        for f in matches:
+            fid = f.get("provisional_id")
+            if fid in seen_ids:
+                continue
+            seen_ids.add(fid)
+            files.append(f)
+    return files
+
 def list_inbox_files(token, folder):
     """
-    Look up each file expected by the local ListFiles.txt manifest, by its
-    exact filename. A full exact filename can only ever match 0 or 1 files
-    at EGA, so this can never trip the "too much data" response-size cap
-    that a broad folder-level prefix query hits on large batches — no
-    guessing/splitting required.
-
-    Each file is checked against all three possible statuses, since a file
-    can move out of "inbox" (e.g. once EGA finishes checksum verification)
-    before this script runs.
+    Fetch the actual folder listing from EGA (see _fetch_folder_files) and
+    match it locally against the local ListFiles.txt manifest, by exact
+    filename (after stripping .gpg — EGA drops that suffix once a file is
+    in the inbox).
     """
     targets = _read_manifest_targets(folder)
     print(f"  {len(targets)} expected file(s) from ListFiles.txt")
@@ -152,44 +211,35 @@ def list_inbox_files(token, folder):
     session = requests.Session()
     session.headers.update(auth_headers(token))
 
+    actual = _fetch_folder_files(session, folder)
+    by_path = {}
+    for f in actual:
+        # relative_path comes back as the FULL path (e.g.
+        # "/eso05_batch2/cu08_p1r4K8.bam.bai"), not just the filename —
+        # confirmed by --debug's own printout. ListFiles.txt targets are
+        # bare filenames (_read_manifest_targets already strips directories
+        # via os.path.basename), so normalize this side to match: strip
+        # .gpg, then take the basename too.
+        p = f["relative_path"]
+        if p.endswith(".gpg"):
+            p = p[:-4]
+        p = os.path.basename(p)
+        by_path.setdefault(p, []).append(f)
+
     seen_ids = set()
     files = []
     missing = []
-    for i, name in enumerate(targets):
-        matches = []
-        for status in ["inbox", "submitted", "available"]:
-            resp = _get_with_retry(
-                session,
-                f"{API_BASE}/files",
-                params={"status": status, "prefix": f"/{folder}/{name}"},
-            )
-            matches = resp.json()
-            if matches:
-                break
-
-        # A prefix match on "X.bam" will also match "X.bam.bai" (it's a
-        # literal string-prefix of it), so filter to only the file whose
-        # relative_path is exactly this target — not files that merely start
-        # with it — and de-dup by provisional_id as a second safety net.
-        found = False
+    for name in targets:
+        matches = by_path.get(name, [])
+        if not matches:
+            missing.append(name)
+            continue
         for f in matches:
-            p = f["relative_path"]
-            if p.endswith(".gpg"):
-                p = p[:-4]
-            if p != name:
-                continue
-            found = True
             fid = f.get("provisional_id")
             if fid in seen_ids:
                 continue
             seen_ids.add(fid)
             files.append(f)
-        if not found:
-            missing.append(name)
-
-        if (i + 1) % 50 == 0:
-            print(f"    ...checked {i + 1}/{len(targets)}")
-        time.sleep(0.1)  # small pacing to avoid tripping rate limits
 
     if missing:
         preview = ", ".join(missing[:5])
@@ -197,6 +247,30 @@ def list_inbox_files(token, folder):
         print(f"  ⚠ {len(missing)} expected file(s) not found in inbox: {preview}{more}")
 
     return files
+
+def debug_list_actual_files(token, folder):
+    """
+    Print every file EGA has actually indexed under /{folder}/, across all
+    three statuses, with no filename filtering at all.
+
+    Useful when list_inbox_files() reports files "not found" — this prints
+    ground truth: what EGA thinks is under that folder path right now,
+    regardless of what ListFiles.txt says should be there. Compare the two
+    lists by eye to spot a mismatch fast.
+    """
+    print(f"\n[DEBUG] Actual files under /{folder}/ in EGA inbox (any status):")
+    session = requests.Session()
+    session.headers.update(auth_headers(token))
+
+    actual = _fetch_folder_files(session, folder)
+    for f in actual:
+        print(f"  {f['relative_path']}")
+
+    if not actual:
+        print(f"  (nothing indexed under /{folder}/ in any status — either "
+              f"the upload hasn't landed there yet, or it went to a "
+              f"different path)")
+    print(f"[DEBUG] {len(actual)} total file(s) found under /{folder}/\n")
 
 # ── Analysis creation ──────────────────────────────────────────────────────────
 
@@ -253,13 +327,17 @@ def create_analysis(token, folder, sample_name, batch_name, sample_accession):
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main():
-    if len(sys.argv) != 2:
-        sys.exit("Usage: python Register_metadata.py <folder>\nExample: python Register_metadata.py eso02_batch2")
+    args = sys.argv[1:]
+    debug = "--debug" in args
+    args = [a for a in args if a != "--debug"]
+
+    if len(args) != 1:
+        sys.exit("Usage: python Register_metadata.py <folder> [--debug]\nExample: python Register_metadata.py eso02_batch2")
 
     # Strip any trailing slash (e.g. from shell tab-completion, "eso02_batch2/"
     # -> "eso02_batch2") — a trailing slash would otherwise produce a
     # double-slash in API prefix queries later and silently match nothing.
-    folder = sys.argv[1].rstrip("/")
+    folder = args[0].rstrip("/")
 
     # Extract sample and batch from folder name: "eso02_batch2" → "eso02", "batch2"
     parts = folder.split("_batch")
@@ -278,6 +356,9 @@ def main():
 
     username, password = load_credentials()
     token = get_access_token(username, password)
+
+    if debug:
+        debug_list_actual_files(token, folder)
 
     create_analysis(token, folder, sample_name, batch_name, sample_accession)
 
