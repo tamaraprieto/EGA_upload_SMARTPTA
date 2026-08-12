@@ -166,7 +166,7 @@ SAMPLE_MAP = {
 }  
 ```
 
-Register BAM files (DNA) under analyses
+A. Register BAM files (DNA) under analyses
 ```bash
 python Register_metadata.py eso02_batch3
 ```
@@ -178,11 +178,11 @@ The script:
 - Creates a `REFERENCE ALIGNMENT` analysis linked to the study and sample
 
 
-Register fastq files (RNA) under Runs (create experiments too). As the fastq file size from RNA is usually smaller, you will only need to do this once. 
+B. Register fastq files (RNA) under Runs (create experiments too). As the fastq file size from RNA is usually smaller, you will only need to do this once. 
 You should create a different folder based on the instrument model that was used for sequencing.
 ```bash
 python Register_RNA.py rna_6000_encrypted     --instrument-model "Illumina NovaSeq 6000"     --inbox-folder all_rna_encrypted     --no-link-dataset
-python Register_RNA.py rna_plusx_encrypted     --instrument-model "Illumina NovaSeq Plus X"     --inbox-folder all_rna_encrypted     --no-link-dataset
+python Register_RNA.py rna_xplus_encrypted     --instrument-model "Illumina NovaSeq Plus X"     --inbox-folder all_rna_encrypted     --no-link-dataset
 ```
 
 
